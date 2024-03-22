@@ -17,9 +17,14 @@ fn evaluate_expression(tokens: &[char], pos: usize, end: usize) -> Result<(i32, 
 
     while pos < end {
         match tokens[pos] {
-            '+' | '-' => {
+            '+' => {
                 let (rhs, new_pos) = evaluate_term(tokens, pos + 1, end)?;
                 lhs += rhs;
+                pos = new_pos;
+            }
+            '-' => {
+                let (rhs, new_pos) = evaluate_term(tokens, pos + 1, end)?;
+                lhs -= rhs;
                 pos = new_pos;
             }
             _ => break,
@@ -38,9 +43,17 @@ fn evaluate_term(tokens: &[char], pos: usize, end: usize) -> Result<(i32, usize)
 
     while pos < end {
         match tokens[pos] {
-            '*' | '/' => {
+            '*' => {
                 let (rhs, new_pos) = evaluate_factor(tokens, pos + 1, end)?;
                 lhs *= rhs;
+                pos = new_pos;
+            }
+            '/' => {
+                let (rhs, new_pos) = evaluate_factor(tokens, pos + 1, end)?;
+                if rhs == 0 {
+                    return Err("エラー：0で除算することはできません。".to_string());
+                }
+                lhs /= rhs;
                 pos = new_pos;
             }
             _ => break,
